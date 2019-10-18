@@ -1,0 +1,8 @@
+nu\t4\gamestatsapp\beans\MatchBean.class
+nu\t4\gamestatsapp\beans\TeamBean.class
+nu\t4\gamestatsapp\entities\Team.class
+nu\t4\gamestatsapp\entities\Match.class
+nu\t4\gamestatsapp\ConnectionFactory.class
+nu\t4\gamestatsapp\JAXRSConfiguration.class
+nu\t4\gamestatsapp\resources\JavaEE8Resource.class
+nu\t4\gamestatsapp\resources\MatchResource.class
