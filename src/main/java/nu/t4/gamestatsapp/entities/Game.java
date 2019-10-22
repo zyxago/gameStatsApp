@@ -1,8 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package nu.t4.gamestatsapp.entities;
 
 /**
@@ -10,18 +6,23 @@ package nu.t4.gamestatsapp.entities;
  * @author Erik
  */
 public class Game {
+
     private String homeTeam;
     private String awayTeam;
     private int homeScore;
     private int awayScore;
     private int gameId;
+    private int homeId;
+    private int awayId;
 
-    public Game(String homeTeam, String awayTeam, int homeScore, int awayScore, int gameId) {
+    public Game(String homeTeam, String awayTeam, int homeScore, int awayScore, int gameId, int homeId, int awayId) {
         this.homeTeam = homeTeam;
         this.awayTeam = awayTeam;
         this.homeScore = homeScore;
         this.awayScore = awayScore;
         this.gameId = gameId;
+        this.homeId = homeId;
+        this.awayId = awayId;
     }
 
     public Game() {
@@ -66,5 +67,21 @@ public class Game {
     public void setGameId(int gameId) {
         this.gameId = gameId;
     }
-    
+
+    public int getHomeId() {
+        return homeId;
+    }
+
+    public void setHomeId(int homeId) {
+        this.homeId = homeId;
+    }
+
+    public int getAwayId() {
+        return awayId;
+    }
+
+    public void setAwayId(int awayId) {
+        this.awayId = awayId;
+    }
+
 }

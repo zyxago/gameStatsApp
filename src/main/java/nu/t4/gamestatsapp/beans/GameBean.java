@@ -1,12 +1,9 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package nu.t4.gamestatsapp.beans;
 
 import com.mysql.jdbc.Connection;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +30,8 @@ public class GameBean {
                         data.getString("away"),
                         data.getInt("scoreHome"),
                         data.getInt("scoreAway"),
+                        data.getInt("homeId"),
+                        data.getInt("awayId"),
                         id);
             }
         } catch (Exception e) {
@@ -53,6 +52,8 @@ public class GameBean {
                         data.getString("away"),
                         data.getInt("scoreHome"),
                         data.getInt("scoreAway"),
+                        data.getInt("homeId"),
+                        data.getInt("awayId"),
                         data.getInt("gameId")));
             }
         } catch (Exception e) {
@@ -61,16 +62,63 @@ public class GameBean {
         return games;
     }
 
-    public boolean addGame(Game game) {
+    public int addGame(Game game) {
         try ( Connection connection = ConnectionFactory.getConnection()) {
-            int homeId = 0;
-            int awayId = 0;
-            int scoreId = 0;
             Statement stmt = connection.createStatement();
-            String sql = String.format("INSERT INTO score (NULL, home_score, away_score) VALUES(%d, %d)", game.getHomeScore(), game.getAwayScore());
-            String sql2 = String.format("INSERT INTO game_match (NULL, home_team_id, away_team_id, score_id) VALUES(%d, %d, %d)", homeId, awayId, scoreId);
+            int homeId = game.getHomeId();
+            int awayId = game.getAwayId();
+            int scoreId = getScoreId(stmt, game.getHomeScore(), game.getAwayScore());
+
+            String sql = String.format("INSERT INTO game_match (NULL, home_team_id, away_team_id, score_id) VALUES(%d, %d, %d)", homeId, awayId, scoreId);
+            return stmt.executeUpdate(sql);
         } catch (Exception e) {
-            
+            System.out.println("Error in GameBean.addGame: " + e.getMessage());
         }
+        return 0;
+    }
+
+    public int updateGame(Game game) {
+        try ( Connection connection = ConnectionFactory.getConnection()) {
+            Statement stmt = connection.createStatement();
+            int homeId = game.getHomeId();
+            int awayId = game.getAwayId();
+            int scoreId = getScoreId(stmt, game.getHomeScore(), game.getAwayScore());
+
+            String sql = String.format("UPDATE game_match SET home_team_id, away_team_id, score_id) VALUES(%d, %d, %d)", homeId, awayId, scoreId);
+            return stmt.executeUpdate(sql);
+        } catch (Exception e) {
+            System.out.println("Error in GameBean.addGame: " + e.getMessage());
+        }
+        return 0;
+    }
+
+    public int deleteGame(int id) {
+        try (Connection connection = ConnectionFactory.getConnection()) {
+            Statement stmt = connection.createStatement();
+            String sql = String.format("DELETE game_match WHERE game_match.id = %d", id);
+            return stmt.executeUpdate(sql);
+        } catch (Exception e) {
+            System.out.println("Error in GameBean.deleteGame: " + e.getMessage());
+        }
+        return 0;
+    }
+
+    private int getScoreId(Statement stmt, int scoreHome, int scoreAway) throws SQLException {
+        int scoreId = 0;
+        String sql = String.format("SELECT id FROM score WHERE home_score = %d AND away_score = %d", scoreHome, scoreAway);
+        ResultSet data = stmt.executeQuery(sql);
+        if (data.next()) {
+            scoreId = data.getInt("id");
+        } else {
+            sql = String.format("INSERT INTO score (NULL, home_score, away_score) VALUES(%d, %d)", scoreHome, scoreAway);
+            stmt.executeUpdate(sql);
+
+            sql = String.format("SELECT id FROM score WHERE home_score = %d AND away_score = %d", scoreHome, scoreAway);
+            data = stmt.executeQuery(sql);
+            if (data.next()) {
+                scoreId = data.getInt("id");
+            }
+        }
+        return scoreId;
     }
 }
