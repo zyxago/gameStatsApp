@@ -84,7 +84,7 @@ public class GameBean {
             int awayId = game.getAwayId();
             int scoreId = getScoreId(stmt, game.getHomeScore(), game.getAwayScore());
 
-            String sql = String.format("UPDATE game_match SET home_team_id, away_team_id, score_id) VALUES(%d, %d, %d)", homeId, awayId, scoreId);
+            String sql = String.format("UPDATE game_match SET home_team_id, away_team_id, score_id VALUES(%d, %d, %d)", homeId, awayId, scoreId);
             return stmt.executeUpdate(sql);
         } catch (Exception e) {
             System.out.println("Error in GameBean.addGame: " + e.getMessage());

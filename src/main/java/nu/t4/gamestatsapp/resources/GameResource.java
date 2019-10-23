@@ -27,7 +27,7 @@ public class GameResource {
 
     @EJB
     GameBean gameBean;
-
+    
     @GET
     @Path("game/{id}")
     public Response getMatch(@PathParam("id") int id) {

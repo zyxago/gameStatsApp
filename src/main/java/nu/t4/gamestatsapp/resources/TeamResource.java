@@ -1,4 +1,3 @@
-
 package nu.t4.gamestatsapp.resources;
 
 import java.util.List;
@@ -50,19 +49,28 @@ public class TeamResource {
     
     @POST
     @Path("team")
-    public Response addTeam(Team team) {
-        
+    public Response postTeam(Team team) {
+        if(teamBean.addTeam(team) == 1){
+            return Response.status(Response.Status.CREATED).build();
+        }
+        return Response.status(Response.Status.BAD_REQUEST).build();
     }
     
     @PUT
     @Path("team")
     public Response updateTeam(Team team) {
-        
+        if(teamBean.updateTeam(team) == 1){
+            return Response.ok().build();
+        }
+        return Response.status(Response.Status.BAD_REQUEST).build();
     }
     
     @DELETE
     @Path("team")
     public Response deleteTeam(@PathParam("id") int id){
-        
+        if(teamBean.deleteTeam(id) == 1){
+            return Response.ok().build();
+        }
+        return Response.status(Response.Status.BAD_REQUEST).build();
     }
 }
