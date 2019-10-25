@@ -30,12 +30,18 @@ public class GameResource {
     
     @GET
     @Path("game/{id}")
-    public Response getMatch(@PathParam("id") int id) {
+    public Response getGame(@PathParam("id") int id) {
         Game game = gameBean.getGame(id);
         if (game != null) {
             return Response.ok(game).build();
         }
         return Response.status(Response.Status.BAD_REQUEST).build();
+    }
+    
+    @GET
+    @Path("teamGames/{id}")
+    public Response getTeamGames(){
+        
     }
 
     @GET
