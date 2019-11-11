@@ -1,8 +1,12 @@
-nu\t4\gamestatsapp\beans\MatchBean.class
 nu\t4\gamestatsapp\beans\TeamBean.class
-nu\t4\gamestatsapp\entities\Team.class
-nu\t4\gamestatsapp\entities\Match.class
+nu\t4\gamestatsapp\beans\ScoreBoardBean.class
+nu\t4\gamestatsapp\resources\BoardResources.class
+nu\t4\gamestatsapp\resources\GameResource.class
 nu\t4\gamestatsapp\ConnectionFactory.class
+nu\t4\gamestatsapp\resources\TeamResource.class
+nu\t4\gamestatsapp\entities\Game.class
+nu\t4\gamestatsapp\entities\TeamTotalPoints.class
+nu\t4\gamestatsapp\beans\GameBean.class
+nu\t4\gamestatsapp\entities\Team.class
+nu\t4\gamestatsapp\entities\ScoreBoard.class
 nu\t4\gamestatsapp\JAXRSConfiguration.class
-nu\t4\gamestatsapp\resources\JavaEE8Resource.class
-nu\t4\gamestatsapp\resources\MatchResource.class

@@ -66,7 +66,7 @@ public class TeamResource {
     }
     
     @DELETE
-    @Path("team")
+    @Path("team/{id}")
     public Response deleteTeam(@PathParam("id") int id){
         if(teamBean.deleteTeam(id) == 1){
             return Response.ok().build();

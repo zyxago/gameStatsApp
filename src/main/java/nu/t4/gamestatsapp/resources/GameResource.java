@@ -40,8 +40,12 @@ public class GameResource {
     
     @GET
     @Path("teamGames/{id}")
-    public Response getTeamGames(){
-        
+    public Response getTeamGames(@PathParam("id") int id){
+        List<Game> games = gameBean.getTeamGames(id);
+        if(!games.isEmpty()){
+            return Response.ok(games).build();
+        }
+        return Response.status(Response.Status.BAD_REQUEST).build();
     }
 
     @GET
@@ -68,13 +72,13 @@ public class GameResource {
     @Path("game")
     public Response updateGame(Game game) {
         if (gameBean.updateGame(game) == 1) {
-            return Response.ok().build();
+            return Response.status(Response.Status.OK).entity(game).build();
         }
         return Response.status(Response.Status.BAD_REQUEST).build();
     }
 
     @DELETE
-    @Path("game{id}")
+    @Path("game/{id}")
     public Response deleteGame(@PathParam("id") int id) {
         if (gameBean.deleteGame(id) == 1) {
             return Response.ok().build();

@@ -1,6 +1,7 @@
 package nu.t4.gamestatsapp.beans;
 
 import com.mysql.jdbc.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -34,9 +35,9 @@ public class TeamBean {
     public Team getTeam(int id) {
         Team team = null;
         try ( Connection connection = ConnectionFactory.getConnection()) {
-            Statement stmt = connection.createStatement();
-            String sql = String.format("SELECT * FROM team WHERE id = %d", id);
-            ResultSet data = stmt.executeQuery(sql);
+            PreparedStatement stmt = connection.prepareStatement("SELECT * FROM team WHERE id = ?");
+            stmt.setInt(1, id);
+            ResultSet data = stmt.executeQuery();
             if (data.next()) {
                 team = new Team(data.getString("name"), data.getInt("id"));
             }
@@ -48,9 +49,10 @@ public class TeamBean {
 
     public int updateTeam(Team team) {
         try ( Connection connection = ConnectionFactory.getConnection()) {
-            Statement stmt = connection.createStatement();
-            String sql = String.format("UPDATE team SET name VALUES(%s)", team.getName());
-            return stmt.executeUpdate(sql);
+            PreparedStatement stmt = connection.prepareStatement("UPDATE team SET name = ? WHERE team.id = ?");
+            stmt.setString(1, team.getName());
+            stmt.setInt(2, team.getId());
+            return stmt.executeUpdate();
         } catch (Exception e) {
             System.out.println("ERROR in TeamBean.updateTeam: " + e.getMessage());
         }
@@ -59,9 +61,9 @@ public class TeamBean {
 
     public int deleteTeam(int id) {
         try ( Connection connection = ConnectionFactory.getConnection()) {
-            Statement stmt = connection.createStatement();
-            String sql = String.format("DELETE team WHERE id = %d", id);
-            return stmt.executeUpdate(sql);
+            PreparedStatement stmt = connection.prepareStatement("DELETE FROM team WHERE id = ?");
+            stmt.setInt(1, id);
+            return stmt.executeUpdate();
         } catch (Exception e) {
             System.out.println("ERROR in TeamBean.deleteTeam: " + e.getMessage());
         }
@@ -70,9 +72,9 @@ public class TeamBean {
 
     public int addTeam(Team team) {
         try ( Connection connection = ConnectionFactory.getConnection()) {
-            Statement stmt = connection.createStatement();
-            String sql = String.format("INSERT INTO team VALUES (NULL, %s)", team.getName());
-            return stmt.executeUpdate(sql);
+            PreparedStatement stmt = connection.prepareStatement("INSERT INTO team VALUES (NULL, ?)");
+            stmt.setString(1, team.getName());
+            return stmt.executeUpdate();
         } catch (Exception e) {
             System.out.println("ERROR in TeamBean.addTeam: " + e.getMessage());
         }
