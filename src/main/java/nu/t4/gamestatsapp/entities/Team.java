@@ -10,11 +10,12 @@ public class Team {
     private int id;
     private int wins;
     private int losses;
-
+    private int games;
+    
     public Team() {
     }
 
-    public Team(String name, int id, int wins, int losses) {
+    public Team(String name, int id, int wins, int losses, int games) {
         this.name = name;
         this.id = id;
         this.wins = wins;
@@ -51,6 +52,14 @@ public class Team {
 
     public void setLosses(int losses) {
         this.losses = losses;
+    }
+
+    public int getGames() {
+        return games;
+    }
+
+    public void setGames(int games) {
+        this.games = games;
     }
     
     
