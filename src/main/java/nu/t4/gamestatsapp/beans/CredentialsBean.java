@@ -29,8 +29,8 @@ public class CredentialsBean {
         String hashedPassword = "a";//TEMP
         return (BCrypt.verifyer().verify(credentials.getPassword().toCharArray(), hashedPassword).verified);
     }
-    
-    public int addUser(Credentials credentials){
+
+    public int saveCredentials(Credentials credentials) {
         try (Connection connection = ConnectionFactory.getConnection()) {
             PreparedStatement stmt = connection.prepareStatement("INSERT INTO user (name, hash, privilege) VALUES(?, ?, ?)");
             stmt.setString(1, credentials.getUsername());
