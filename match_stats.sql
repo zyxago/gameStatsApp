@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Värd: 127.0.0.1
--- Tid vid skapande: 21 okt 2019 kl 16:07
+-- Tid vid skapande: 14 nov 2019 kl 11:42
 -- Serverversion: 10.4.6-MariaDB
 -- PHP-version: 7.3.9
 
@@ -38,6 +38,17 @@ CREATE TABLE `away_team` (
 -- --------------------------------------------------------
 
 --
+-- Ersättningsstruktur för vy `games_played`
+-- (See below for the actual view)
+--
+CREATE TABLE `games_played` (
+`id` int(11)
+,`games` bigint(21)
+);
+
+-- --------------------------------------------------------
+
+--
 -- Tabellstruktur `game_match`
 --
 
@@ -61,11 +72,12 @@ INSERT INTO `game_match` (`id`, `home_team_id`, `away_team_id`, `score_id`) VALU
 -- --------------------------------------------------------
 
 --
--- Ersättningsstruktur för vy `getaway`
+-- Ersättningsstruktur för vy `get_away`
 -- (See below for the actual view)
 --
-CREATE TABLE `getaway` (
+CREATE TABLE `get_away` (
 `gameId` int(11)
+,`awayId` int(11)
 ,`away` varchar(45)
 ,`scoreAway` int(11)
 );
@@ -73,11 +85,12 @@ CREATE TABLE `getaway` (
 -- --------------------------------------------------------
 
 --
--- Ersättningsstruktur för vy `gethome`
+-- Ersättningsstruktur för vy `get_home`
 -- (See below for the actual view)
 --
-CREATE TABLE `gethome` (
+CREATE TABLE `get_home` (
 `gameId` int(11)
+,`homeId` int(11)
 ,`home` varchar(45)
 ,`scoreHome` int(11)
 );
@@ -91,9 +104,12 @@ CREATE TABLE `gethome` (
 CREATE TABLE `get_match` (
 `gameId` int(11)
 ,`home` varchar(45)
+,`homeId` int(11)
 ,`away` varchar(45)
+,`awayId` int(11)
 ,`scoreHome` int(11)
 ,`scoreAway` int(11)
+,`winner` varchar(45)
 );
 
 -- --------------------------------------------------------
@@ -153,23 +169,28 @@ INSERT INTO `team` (`id`, `name`) VALUES
 -- --------------------------------------------------------
 
 --
--- Ersättningsstruktur för vy `teampoints`
+-- Ersättningsstruktur för vy `team_stats`
 -- (See below for the actual view)
 --
-CREATE TABLE `teampoints` (
-`name` varchar(45)
-,`points` decimal(32,0)
+CREATE TABLE `team_stats` (
+`teamId` int(11)
+,`name` varchar(45)
+,`wins` decimal(32,0)
+,`losses` decimal(32,0)
+,`games` bigint(21)
 );
 
 -- --------------------------------------------------------
 
 --
--- Ersättningsstruktur för vy `team_total_points`
+-- Ersättningsstruktur för vy `team_wins_losses`
 -- (See below for the actual view)
 --
-CREATE TABLE `team_total_points` (
-`team` varchar(45)
-,`points` decimal(54,0)
+CREATE TABLE `team_wins_losses` (
+`teamId` int(11)
+,`name` varchar(45)
+,`games_won` int(11)
+,`games_lost` int(11)
 );
 
 -- --------------------------------------------------------
@@ -195,20 +216,29 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 -- --------------------------------------------------------
 
 --
--- Struktur för vy `getaway`
+-- Struktur för vy `games_played`
 --
-DROP TABLE IF EXISTS `getaway`;
+DROP TABLE IF EXISTS `games_played`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `getaway`  AS  select `game_match`.`id` AS `gameId`,`team`.`name` AS `away`,`score`.`away_score` AS `scoreAway` from ((`game_match` join `team`) join `score`) where `game_match`.`away_team_id` = `team`.`id` and `game_match`.`score_id` = `score`.`id` ;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `games_played`  AS  select `team`.`id` AS `id`,count(`game_match`.`home_team_id`) AS `games` from (`team` join `game_match`) where `team`.`id` = `game_match`.`away_team_id` or `team`.`id` = `game_match`.`home_team_id` group by `team`.`id` ;
 
 -- --------------------------------------------------------
 
 --
--- Struktur för vy `gethome`
+-- Struktur för vy `get_away`
 --
-DROP TABLE IF EXISTS `gethome`;
+DROP TABLE IF EXISTS `get_away`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `gethome`  AS  select `game_match`.`id` AS `gameId`,`team`.`name` AS `home`,`score`.`home_score` AS `scoreHome` from ((`game_match` join `team`) join `score`) where `game_match`.`home_team_id` = `team`.`id` and `game_match`.`score_id` = `score`.`id` ;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `get_away`  AS  select `game_match`.`id` AS `gameId`,`team`.`id` AS `awayId`,`team`.`name` AS `away`,`score`.`away_score` AS `scoreAway` from ((`game_match` join `team`) join `score`) where `game_match`.`away_team_id` = `team`.`id` and `game_match`.`score_id` = `score`.`id` ;
+
+-- --------------------------------------------------------
+
+--
+-- Struktur för vy `get_home`
+--
+DROP TABLE IF EXISTS `get_home`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `get_home`  AS  select `game_match`.`id` AS `gameId`,`team`.`id` AS `homeId`,`team`.`name` AS `home`,`score`.`home_score` AS `scoreHome` from ((`game_match` join `team`) join `score`) where `game_match`.`home_team_id` = `team`.`id` and `game_match`.`score_id` = `score`.`id` ;
 
 -- --------------------------------------------------------
 
@@ -217,7 +247,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 --
 DROP TABLE IF EXISTS `get_match`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `get_match`  AS  select `gethome`.`gameId` AS `gameId`,`gethome`.`home` AS `home`,`getaway`.`away` AS `away`,`gethome`.`scoreHome` AS `scoreHome`,`getaway`.`scoreAway` AS `scoreAway` from (`gethome` join `getaway` on(`getaway`.`gameId` = `gethome`.`gameId`)) ;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `get_match`  AS  select `get_home`.`gameId` AS `gameId`,`get_home`.`home` AS `home`,`get_home`.`homeId` AS `homeId`,`get_away`.`away` AS `away`,`get_away`.`awayId` AS `awayId`,`get_home`.`scoreHome` AS `scoreHome`,`get_away`.`scoreAway` AS `scoreAway`,case `get_home`.`home` when `get_home`.`scoreHome` > `get_away`.`scoreAway` then `get_away`.`away` when `get_home`.`scoreHome` < `get_away`.`scoreAway` then `get_home`.`home` end AS `winner` from (`get_home` join `get_away` on(`get_away`.`gameId` = `get_home`.`gameId`)) ;
 
 -- --------------------------------------------------------
 
@@ -231,20 +261,20 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 -- --------------------------------------------------------
 
 --
--- Struktur för vy `teampoints`
+-- Struktur för vy `team_stats`
 --
-DROP TABLE IF EXISTS `teampoints`;
+DROP TABLE IF EXISTS `team_stats`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `teampoints`  AS  select `team`.`name` AS `name`,sum(`score`.`home_score`) AS `points` from (`team` join (`score` join `game_match` on(`game_match`.`score_id` = `score`.`id`))) where `game_match`.`home_team_id` = `team`.`id` union all select `team`.`name` AS `name`,sum(`score`.`away_score`) AS `SUM(score.away_score)` from (`team` join (`score` join `game_match` on(`game_match`.`score_id` = `score`.`id`))) where `game_match`.`away_team_id` = `team`.`id` group by `team`.`name` ;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `team_stats`  AS  select `team_wins_losses`.`teamId` AS `teamId`,`team_wins_losses`.`name` AS `name`,sum(`team_wins_losses`.`games_won`) AS `wins`,sum(`team_wins_losses`.`games_lost`) AS `losses`,`games_played`.`games` AS `games` from (`team_wins_losses` join `games_played` on(`games_played`.`id` = `team_wins_losses`.`teamId`)) group by `team_wins_losses`.`name` ;
 
 -- --------------------------------------------------------
 
 --
--- Struktur för vy `team_total_points`
+-- Struktur för vy `team_wins_losses`
 --
-DROP TABLE IF EXISTS `team_total_points`;
+DROP TABLE IF EXISTS `team_wins_losses`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `team_total_points`  AS  select `teampoints`.`name` AS `team`,sum(`teampoints`.`points`) AS `points` from `teampoints` group by `teampoints`.`name` ;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `team_wins_losses`  AS  select `team`.`id` AS `teamId`,`team`.`name` AS `name`,`get_home`.`scoreHome` AS `games_won`,`get_away`.`scoreAway` AS `games_lost` from ((`team` join `get_home`) join `get_away`) where `get_home`.`gameId` = `get_away`.`gameId` and `team`.`id` = `get_home`.`homeId` union all select `team`.`id` AS `teamId`,`team`.`name` AS `name`,`get_away`.`scoreAway` AS `games_won`,`get_home`.`scoreHome` AS `games_lost` from ((`team` join `get_home`) join `get_away`) where `get_home`.`gameId` = `get_away`.`gameId` and `team`.`id` = `get_away`.`awayId` group by `team`.`name` ;
 
 --
 -- Index för dumpade tabeller

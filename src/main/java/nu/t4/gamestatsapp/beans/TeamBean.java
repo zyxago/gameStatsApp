@@ -21,10 +21,10 @@ public class TeamBean {
         List<Team> teams = new ArrayList();
         try ( Connection connection = ConnectionFactory.getConnection()) {
             Statement stmt = connection.createStatement();
-            String sql = "SELECT * FROM team";
+            String sql = "SELECT * FROM team_stats";
             ResultSet data = stmt.executeQuery(sql);
             while (data.next()) {
-                teams.add(new Team(data.getString("name"), data.getInt("id")));
+                teams.add(new Team(data.getString("name"), data.getInt("teamId"), data.getInt("wins"), data.getInt("losses")));
             }
         } catch (Exception e) {
             System.out.println("ERROR in TeamBean.getTeams: " + e.getMessage());
@@ -35,11 +35,11 @@ public class TeamBean {
     public Team getTeam(int id) {
         Team team = null;
         try ( Connection connection = ConnectionFactory.getConnection()) {
-            PreparedStatement stmt = connection.prepareStatement("SELECT * FROM team WHERE id = ?");
+            PreparedStatement stmt = connection.prepareStatement("SELECT * FROM team_stats WHERE id = ?");
             stmt.setInt(1, id);
             ResultSet data = stmt.executeQuery();
             if (data.next()) {
-                team = new Team(data.getString("name"), data.getInt("id"));
+                team = new Team(data.getString("name"), data.getInt("teamId"), data.getInt("wins"), data.getInt("losses"));
             }
         } catch (Exception e) {
             System.out.println("ERROR in TeamBean.getTeams: " + e.getMessage());
@@ -72,7 +72,7 @@ public class TeamBean {
 
     public int addTeam(Team team) {
         try ( Connection connection = ConnectionFactory.getConnection()) {
-            PreparedStatement stmt = connection.prepareStatement("INSERT INTO team VALUES (NULL, ?)");
+            PreparedStatement stmt = connection.prepareStatement("INSERT INTO team (name) VALUES (?)");
             stmt.setString(1, team.getName());
             return stmt.executeUpdate();
         } catch (Exception e) {

@@ -14,8 +14,9 @@ public class Game {
     private int gameId;
     private int homeId;
     private int awayId;
+    private String winner;
 
-    public Game(String homeTeam, String awayTeam, int homeScore, int awayScore, int gameId, int homeId, int awayId) {
+    public Game(String homeTeam, String awayTeam, int homeScore, int awayScore, int gameId, int homeId, int awayId, String winner) {
         this.homeTeam = homeTeam;
         this.awayTeam = awayTeam;
         this.homeScore = homeScore;
@@ -23,6 +24,7 @@ public class Game {
         this.gameId = gameId;
         this.homeId = homeId;
         this.awayId = awayId;
+        this.winner = winner;
     }
 
     public Game() {
@@ -82,6 +84,14 @@ public class Game {
 
     public void setAwayId(int awayId) {
         this.awayId = awayId;
+    }
+
+    public String getWinner() {
+        return winner;
+    }
+
+    public void setWinner(String winner) {
+        this.winner = winner;
     }
 
 }

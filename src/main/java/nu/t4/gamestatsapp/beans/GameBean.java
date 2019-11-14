@@ -32,7 +32,8 @@ public class GameBean {
                         data.getInt("scoreAway"),
                         data.getInt("homeId"),
                         data.getInt("awayId"),
-                        id);
+                        id,
+                        data.getString("winner"));
             }
         } catch (Exception e) {
             System.out.println("Error in GameBean.getGame: " + e.getMessage());
@@ -54,7 +55,8 @@ public class GameBean {
                         data.getInt("scoreAway"),
                         data.getInt("gameId"),
                         data.getInt("homeId"),
-                        data.getInt("awayId")));
+                        data.getInt("awayId"),
+                        data.getString("winner")));
             }
         } catch (Exception e) {
             System.out.println("Error in GameBean.getGames:" + e.getMessage());
@@ -77,7 +79,8 @@ public class GameBean {
                         data.getInt("scoreAway"),
                         data.getInt("gameId"),
                         data.getInt("homeId"),
-                        data.getInt("awayId")));
+                        data.getInt("awayId"),
+                        data.getString("winner")));
             }
         } catch (Exception e) {
             System.out.println("Error in GameBean.getTeamGames: " + e.getMessage());
