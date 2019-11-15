@@ -4,6 +4,7 @@ import javax.ejb.EJB;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 import javax.ws.rs.core.Response;
 import nu.t4.gamestatsapp.beans.CredentialsBean;
 import nu.t4.gamestatsapp.entities.Credentials;
@@ -12,6 +13,7 @@ import nu.t4.gamestatsapp.entities.Credentials;
  *
  * @author Erik
  */
+@Path("authenticate")
 public class UserResources {
 
     @EJB
@@ -20,8 +22,9 @@ public class UserResources {
     @GET
     public Response checkUser(@HeaderParam("authorization") String basicAuth) {
         Credentials credentials = credentialsBean.createCredentials(basicAuth);
-        if (credentialsBean.checkCredentials(credentials)) {
-            return Response.ok("Welcom my friend to the ZONE").build();
+        String token = credentialsBean.checkCredentials(credentials);
+        if (!token.equals("")) {
+            return Response.ok(token).build();
         } else {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }

@@ -24,7 +24,7 @@ public class TeamBean {
             String sql = "SELECT * FROM team_stats";
             ResultSet data = stmt.executeQuery(sql);
             while (data.next()) {
-                teams.add(new Team(data.getString("name"), data.getInt("teamId"), data.getInt("wins"), data.getInt("losses"), data.getInt("games")));
+                teams.add(new Team(data.getString("name"), data.getInt("teamId"), data.getInt("wins"), data.getInt("losses"), data.getInt("played_matches"), data.getInt("won_matches")));
             }
         } catch (Exception e) {
             System.out.println("ERROR in TeamBean.getTeams: " + e.getMessage());
@@ -39,7 +39,7 @@ public class TeamBean {
             stmt.setInt(1, id);
             ResultSet data = stmt.executeQuery();
             if (data.next()) {
-                team = new Team(data.getString("name"), data.getInt("teamId"), data.getInt("wins"), data.getInt("losses"), data.getInt("games"));
+                team = new Team(data.getString("name"), data.getInt("teamId"), data.getInt("wins"), data.getInt("losses"), data.getInt("played_matches"), data.getInt("won_matches"));
             }
         } catch (Exception e) {
             System.out.println("ERROR in TeamBean.getTeams: " + e.getMessage());

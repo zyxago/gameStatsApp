@@ -25,9 +25,8 @@ public class AuthFilter implements ContainerRequestFilter {
             return;
         }
         try {
-            String basicAuth = request.getHeaderString("Authorization");
-            Credentials credentials = credentialsBean.createCredentials(basicAuth);
-            if(credentialsBean.checkCredentials(credentials)) {
+            String token = request.getHeaderString("Authorization");
+            if(credentialsBean.verifyToken(token)) {
                 return;
             }
         } catch (Exception e) {

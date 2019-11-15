@@ -10,16 +10,19 @@ public class Team {
     private int id;
     private int wins;
     private int losses;
-    private int games;
+    private int matchesPlayed;
+    private int matchesWon;
     
     public Team() {
     }
 
-    public Team(String name, int id, int wins, int losses, int games) {
+    public Team(String name, int id, int wins, int losses, int matchesPlayed, int matchesWon) {
         this.name = name;
         this.id = id;
         this.wins = wins;
         this.losses = losses;
+        this.matchesPlayed = matchesPlayed;
+        this.matchesWon = matchesWon;
     }
 
     public String getName() {
@@ -54,13 +57,23 @@ public class Team {
         this.losses = losses;
     }
 
-    public int getGames() {
-        return games;
+    public int getMatchesPlayed() {
+        return matchesPlayed;
     }
 
-    public void setGames(int games) {
-        this.games = games;
+    public void setMatchesPlayed(int matchesPlayed) {
+        this.matchesPlayed = matchesPlayed;
     }
+
+    public int getMatchesWon() {
+        return matchesWon;
+    }
+
+    public void setMatchesWon(int matchesWon) {
+        this.matchesWon = matchesWon;
+    }
+
+    
     
     
 
