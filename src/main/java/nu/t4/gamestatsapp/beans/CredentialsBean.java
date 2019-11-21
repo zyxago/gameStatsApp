@@ -36,14 +36,30 @@ public class CredentialsBean {
         return base64Encoder.encodeToString(randomBytes);
     }
     
-    public boolean verifyToken(String token){
-        Credentials cred = createCredentials(token);
+    public boolean verifyToken(String token){;
         try (Connection connection = ConnectionFactory.getConnection()){
-            PreparedStatement stmt = connection.prepareStatement("SELECT * FROM user WHERE name = ? AND token = ?");
+            PreparedStatement stmt = connection.prepareStatement("SELECT * FROM user WHERE token = ?");
+            stmt.setString(1, token);
+            ResultSet data = stmt.executeQuery();
+            if(data.next()){
+                return true;
+            }
         }catch(Exception e){
             System.out.println("Error in CredentialsBean.verifyToken: " + e.getMessage());
         }
         return false;
+    }
+    
+    private int addToken(Credentials credentials, String token){
+        try (Connection connection = ConnectionFactory.getConnection()){
+            PreparedStatement stmt = connection.prepareStatement("UPDATE user SET token = ? WHERE name = ?");
+            stmt.setString(1, token);
+            stmt.setString(2, credentials.getUsername());
+            return stmt.executeUpdate();
+        } catch (Exception e) {
+            System.out.println("Error in CredentialsBean.addToken: " + e.getMessage());
+        }
+        return 0;
     }
 
     public String checkCredentials(Credentials credentials) {
@@ -61,23 +77,21 @@ public class CredentialsBean {
         }
         if(BCrypt.verifyer().verify(credentials.getPassword().toCharArray(), hashedPassword).verified){
             token = generateNewToken();
-            //Lägg även in token i databas
+            addToken(credentials, token);
         }
         return token;
     }
 
     public int saveCredentials(Credentials credentials) {
         try ( Connection connection = ConnectionFactory.getConnection()) {
-            PreparedStatement stmt = connection.prepareStatement("INSERT INTO user (name, hash, privilege) VALUES(?, ?, ?)");
+            PreparedStatement stmt = connection.prepareStatement("INSERT INTO user (name, hash) VALUES(?, ?)");
             stmt.setString(1, credentials.getUsername());
-            byte[] hashedPassword = BCrypt.withDefaults().hash(6, credentials.getPassword().toCharArray());
-            stmt.setString(2, hashedPassword.toString());
-            stmt.setInt(3, 0);//0 som default
+            String hashedPassword = BCrypt.withDefaults().hashToString(13, credentials.getPassword().toCharArray());
+            stmt.setString(2, hashedPassword);
             return stmt.executeUpdate();
         } catch (Exception e) {
-            System.out.println("Error in CredentialsBean.addUser: " + e.getMessage());
+            System.out.println("Error in CredentialsBean.saveCredentials: " + e.getMessage());
         }
-        BCrypt.withDefaults().hash(6, credentials.getPassword().toCharArray());
         return 0;
     }
 }

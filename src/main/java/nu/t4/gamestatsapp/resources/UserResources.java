@@ -19,6 +19,15 @@ public class UserResources {
     @EJB
     CredentialsBean credentialsBean;
 
+    @Path("/token")
+    @GET
+    public Response verifyUser(@HeaderParam("authorization") String token) {
+        if(credentialsBean.verifyToken(token)){
+            return Response.status(Response.Status.OK).build();
+        }
+        return Response.status(Response.Status.UNAUTHORIZED).build();
+    }
+
     @GET
     public Response checkUser(@HeaderParam("authorization") String basicAuth) {
         Credentials credentials = credentialsBean.createCredentials(basicAuth);
@@ -29,8 +38,9 @@ public class UserResources {
             return Response.status(Response.Status.UNAUTHORIZED).build();
         }
     }
-
-    @POST
+    
+    @Path("/create")
+    @GET
     public Response createUser(@HeaderParam("authorization") String basicAuth) {
         Credentials credentials = credentialsBean.createCredentials(basicAuth);
         if (credentialsBean.saveCredentials(credentials) == 1) {

@@ -110,7 +110,7 @@ public class GameBean {
             stmt.setInt(4, game.getGameId());
             return stmt.executeUpdate();
         } catch (Exception e) {
-            System.out.println("Error in GameBean.addGame: " + e.getMessage());
+            System.out.println("Error in GameBean.updateGame: " + e.getMessage());
         }
         return 0;
     }

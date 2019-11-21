@@ -29,7 +29,7 @@ public class GameResource {
     GameBean gameBean;
     
     @GET
-    @Path("game/{id}")
+    @Path("match/{id}")
     public Response getGame(@PathParam("id") int id) {
         Game game = gameBean.getGame(id);
         if (game != null) {
@@ -39,7 +39,7 @@ public class GameResource {
     }
     
     @GET
-    @Path("teamGames/{id}")
+    @Path("teamMatches/{id}")
     public Response getTeamGames(@PathParam("id") int id){
         List<Game> games = gameBean.getTeamGames(id);
         if(!games.isEmpty()){
@@ -49,7 +49,7 @@ public class GameResource {
     }
 
     @GET
-    @Path("games")
+    @Path("matches")
     public Response getGames() {
         List<Game> games = new ArrayList();
         games = gameBean.getGames();
@@ -60,7 +60,7 @@ public class GameResource {
     }
 
     @POST
-    @Path("game")
+    @Path("match")
     public Response postGame(Game game) {
         if (gameBean.addGame(game) == 1) {
             return Response.status(Response.Status.CREATED).build();
@@ -69,7 +69,7 @@ public class GameResource {
     }
 
     @PUT
-    @Path("game")
+    @Path("match")
     public Response updateGame(Game game) {
         if (gameBean.updateGame(game) == 1) {
             return Response.status(Response.Status.OK).entity(game).build();
@@ -78,7 +78,7 @@ public class GameResource {
     }
 
     @DELETE
-    @Path("game/{id}")
+    @Path("match/{id}")
     public Response deleteGame(@PathParam("id") int id) {
         if (gameBean.deleteGame(id) == 1) {
             return Response.ok().build();
