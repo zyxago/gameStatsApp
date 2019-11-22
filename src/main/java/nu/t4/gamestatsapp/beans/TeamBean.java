@@ -26,6 +26,11 @@ public class TeamBean {
             while (data.next()) {
                 teams.add(new Team(data.getString("name"), data.getInt("teamId"), data.getInt("wins"), data.getInt("losses"), data.getInt("played_matches"), data.getInt("won_matches")));
             }
+            sql = "SELECT * FROM team WHERE team.id NOT IN (SELECT teamId FROM team_stats)";
+            data = stmt.executeQuery(sql);
+            while (data.next()) {
+                teams.add(new Team(data.getString("name"), data.getInt("id")));
+            }
         } catch (Exception e) {
             System.out.println("ERROR in TeamBean.getTeams: " + e.getMessage());
         }
@@ -40,6 +45,13 @@ public class TeamBean {
             ResultSet data = stmt.executeQuery();
             if (data.next()) {
                 team = new Team(data.getString("name"), data.getInt("teamId"), data.getInt("wins"), data.getInt("losses"), data.getInt("played_matches"), data.getInt("won_matches"));
+            } else {
+                stmt = connection.prepareStatement("SELECT * FROM team WHERE team.id = ? AND team.id NOT IN (SELECT teamId FROM team_stats)");
+                stmt.setInt(1, id);
+                data = stmt.executeQuery();
+                if(data.next()){
+                    team = new Team(data.getString("name"), data.getInt("id"));
+                }
             }
         } catch (Exception e) {
             System.out.println("ERROR in TeamBean.getTeams: " + e.getMessage());

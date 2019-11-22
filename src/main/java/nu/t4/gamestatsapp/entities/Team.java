@@ -24,6 +24,15 @@ public class Team {
         this.matchesPlayed = matchesPlayed;
         this.matchesWon = matchesWon;
     }
+    
+        public Team(String name, int id) {
+        this.name = name;
+        this.id = id;
+        this.wins = 0;
+        this.losses = 0;
+        this.matchesPlayed = 0;
+        this.matchesWon = 0;
+    }
 
     public String getName() {
         return name;

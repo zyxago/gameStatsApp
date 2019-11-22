@@ -33,7 +33,8 @@ public class GameBean {
                         data.getInt("homeId"),
                         data.getInt("awayId"),
                         id,
-                        data.getString("winner"));
+                        data.getString("winner"),
+                        data.getInt("scoreId"));
             }
         } catch (Exception e) {
             System.out.println("Error in GameBean.getGame: " + e.getMessage());
@@ -56,15 +57,16 @@ public class GameBean {
                         data.getInt("gameId"),
                         data.getInt("homeId"),
                         data.getInt("awayId"),
-                        data.getString("winner")));
+                        data.getString("winner"),
+                        data.getInt("scoreId")));
             }
         } catch (Exception e) {
             System.out.println("Error in GameBean.getGames:" + e.getMessage());
         }
         return games;
     }
-    
-        public List<Game> getTeamGames(int id) {
+
+    public List<Game> getTeamGames(int id) {
         List<Game> games = new ArrayList();
         try ( Connection connection = ConnectionFactory.getConnection()) {
             PreparedStatement stmt = connection.prepareStatement("SELECT * FROM get_match WHERE homeId = ? OR awayId = ?");
@@ -80,7 +82,8 @@ public class GameBean {
                         data.getInt("gameId"),
                         data.getInt("homeId"),
                         data.getInt("awayId"),
-                        data.getString("winner")));
+                        data.getString("winner"),
+                        data.getInt("scoreId")));
             }
         } catch (Exception e) {
             System.out.println("Error in GameBean.getTeamGames: " + e.getMessage());
@@ -93,7 +96,7 @@ public class GameBean {
             PreparedStatement stmt = connection.prepareStatement("INSERT INTO game_match (home_team_id, away_team_id, score_id) VALUES(?, ?, ?)");
             stmt.setInt(1, game.getHomeId());
             stmt.setInt(2, game.getAwayId());
-            stmt.setInt(3, getScoreId(game.getHomeScore(), game.getAwayScore()));
+            stmt.setInt(3, createScore(game.getHomeScore(), game.getAwayScore()));
             return stmt.executeUpdate();
         } catch (Exception e) {
             System.out.println("Error in GameBean.addGame: " + e.getMessage());
@@ -106,7 +109,7 @@ public class GameBean {
             PreparedStatement stmt = connection.prepareStatement("UPDATE game_match SET home_team_id = ?, away_team_id = ?, score_id = ? WHERE game_match.id = ?");
             stmt.setInt(1, game.getHomeId());
             stmt.setInt(2, game.getAwayId());
-            stmt.setInt(3, getScoreId(game.getHomeScore(), game.getAwayScore()));
+            stmt.setInt(3, updateScoreId(game.getScoreId(), game.getHomeScore(), game.getAwayScore()));
             stmt.setInt(4, game.getGameId());
             return stmt.executeUpdate();
         } catch (Exception e) {
@@ -126,28 +129,36 @@ public class GameBean {
         return 0;
     }
 
-    private int getScoreId(int scoreHome, int scoreAway) throws SQLException {
+    private int createScore(int scoreHome, int scoreAway) {
+        int scoreId = 0;
         try ( Connection connection = ConnectionFactory.getConnection()) {
-            PreparedStatement stmt = connection.prepareStatement("SELECT id FROM score WHERE home_score = ? AND away_score = ?");
+            PreparedStatement stmt = connection.prepareStatement("INSERT INTO score (home_score, away_score) VALUES(?, ?)");
             stmt.setInt(1, scoreHome);
             stmt.setInt(2, scoreAway);
-            int scoreId = 0;
+            stmt.executeUpdate();
+
+            stmt = connection.prepareStatement("SELECT id FROM score WHERE home_score = ? AND away_score = ? ORDER BY id DESC");
+            stmt.setInt(1, scoreHome);
+            stmt.setInt(2, scoreAway);
             ResultSet data = stmt.executeQuery();
             if (data.next()) {
                 scoreId = data.getInt("id");
-            } else {
-                stmt = connection.prepareStatement("INSERT INTO score (home_score, away_score) VALUES(?, ?)");
-                stmt.setInt(1, scoreHome);
-                stmt.setInt(2, scoreAway);
-                stmt.executeUpdate();
+            }
+        } catch (Exception e) {
+            System.out.println("Error in GameBean.createScore: " + e.getMessage());
+        }
+        return scoreId;
+    }
 
-                stmt = connection.prepareStatement("SELECT id FROM score WHERE home_score = ? AND away_score = ?");
-                stmt.setInt(1, scoreHome);
-                stmt.setInt(2, scoreAway);
-                data = stmt.executeQuery();
-                if (data.next()) {
-                    scoreId = data.getInt("id");
-                }
+    private int updateScoreId(int scoreId, int scoreHome, int scoreAway) throws SQLException {
+        try ( Connection connection = ConnectionFactory.getConnection()) {
+            PreparedStatement stmt = connection.prepareStatement("UPDATE score SET home_score = ?, away_score = ? WHERE id = ?");
+            stmt.setInt(1, scoreHome);
+            stmt.setInt(2, scoreAway);
+            stmt.setInt(3, scoreId);
+            //If not exists creat score
+            if (stmt.executeUpdate() == 0) {
+                return createScore(scoreHome, scoreAway);
             }
             return scoreId;
         } catch (Exception e) {
