@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Värd: 127.0.0.1
--- Tid vid skapande: 22 nov 2019 kl 13:37
+-- Tid vid skapande: 22 nov 2019 kl 14:15
 -- Serverversion: 10.4.6-MariaDB
 -- PHP-version: 7.3.9
 
@@ -66,10 +66,11 @@ CREATE TABLE `game_match` (
 INSERT INTO `game_match` (`id`, `home_team_id`, `away_team_id`, `score_id`) VALUES
 (1, 1, 2, 1),
 (2, 1, 2, 2),
-(3, 1, 3, 3),
 (8, 2, 1, 9),
 (9, 3, 1, 10),
-(21, 7, 2, 25);
+(23, 3, 7, 27),
+(26, 4, 8, 30),
+(27, 4, 8, 31);
 
 -- --------------------------------------------------------
 
@@ -175,7 +176,14 @@ INSERT INTO `score` (`id`, `home_score`, `away_score`) VALUES
 (13, 45, 3),
 (16, 11, 13),
 (19, 7, 78),
-(25, 13, 11);
+(25, 13, 11),
+(26, 14, 12),
+(27, 17, 15),
+(28, 123, 123),
+(29, 123, 123),
+(30, 12, 15),
+(31, 11, 9),
+(32, 1, 11);
 
 -- --------------------------------------------------------
 
@@ -193,6 +201,7 @@ CREATE TABLE `team` (
 --
 
 INSERT INTO `team` (`id`, `name`) VALUES
+(8, 'Abomination'),
 (3, 'Adrian'),
 (4, 'Erik'),
 (2, 'Gösta'),
@@ -246,7 +255,7 @@ CREATE TABLE `user` (
 --
 
 INSERT INTO `user` (`id`, `name`, `hash`, `token`) VALUES
-(4, 'admin', '$2a$13$O9O9EomjW6eT0IDFaCzal.2BIeVLH3m6d0xd8a9IMvOZ7bQZQT8eG', '7eMp22uJDqmTC6NG70ybD4EqwwiFu0Yv');
+(4, 'admin', '$2a$13$O9O9EomjW6eT0IDFaCzal.2BIeVLH3m6d0xd8a9IMvOZ7bQZQT8eG', 'qAEw4ioBQzIOlvMz-oE7BNUnFSor-1Y2');
 
 -- --------------------------------------------------------
 
@@ -318,7 +327,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 --
 DROP TABLE IF EXISTS `matches_won`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `matches_won`  AS  select `team`.`id` AS `id`,count(`get_match`.`winner`) AS `won_matches` from (`team` join `get_match`) where `get_match`.`winner` = `team`.`name` group by `team`.`id` ;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `matches_won`  AS  select `team`.`id` AS `id`,coalesce(count(`get_match`.`winner`),0) AS `won_matches` from (`team` join `get_match`) where `get_match`.`winner` = `team`.`name` group by `team`.`id` ;
 
 -- --------------------------------------------------------
 
@@ -327,7 +336,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 --
 DROP TABLE IF EXISTS `team_stats`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `team_stats`  AS  select `team_wins_losses`.`teamId` AS `teamId`,`team_wins_losses`.`name` AS `name`,sum(`team_wins_losses`.`games_won`) AS `wins`,sum(`team_wins_losses`.`games_lost`) AS `losses`,`matches_played`.`played_matches` AS `played_matches`,`matches_won`.`won_matches` AS `won_matches` from ((`team_wins_losses` join `matches_played` on(`matches_played`.`id` = `team_wins_losses`.`teamId`)) join `matches_won` on(`matches_won`.`id` = `team_wins_losses`.`teamId`)) group by `team_wins_losses`.`name` ;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `team_stats`  AS  select `team_wins_losses`.`teamId` AS `teamId`,`team_wins_losses`.`name` AS `name`,sum(`team_wins_losses`.`games_won`) AS `wins`,sum(`team_wins_losses`.`games_lost`) AS `losses`,`matches_played`.`played_matches` AS `played_matches`,coalesce((select `matches_won`.`won_matches` from `matches_won` where `matches_won`.`id` = `team_wins_losses`.`teamId`),0) AS `won_matches` from (`team_wins_losses` join `matches_played` on(`matches_played`.`id` = `team_wins_losses`.`teamId`)) group by `team_wins_losses`.`name` ;
 
 -- --------------------------------------------------------
 
@@ -380,19 +389,19 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT för tabell `game_match`
 --
 ALTER TABLE `game_match`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
 
 --
 -- AUTO_INCREMENT för tabell `score`
 --
 ALTER TABLE `score`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=33;
 
 --
 -- AUTO_INCREMENT för tabell `team`
 --
 ALTER TABLE `team`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT för tabell `user`
